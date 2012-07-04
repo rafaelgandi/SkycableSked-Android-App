@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <widget xmlns = "http://www.w3.org/ns/widgets"
+        xmlns:gap = "http://phonegap.com/ns/1.0"
+        id        = "com.skycable.schedules"
+        versionCode="7" 
+        version   = "0.0.7">
+
+    <!-- versionCode is optional and Android only -->
+
+    <name>SkyCable Sked</name>
+
+    <description>
+       Skycable program schedule reader. LM: 07-03-12
+    </description>
+
+    <author href="http://www.rafaelgandi.tk" email="rafaelgandi@gmail.com">
+        Rafael Gandionco
+    </author>
+	
+	<icon src="icon.png" />
+	
+	<!-- SET TO PORTRAIT ONLY -->
+	<preference name="orientation" value="portrait" />
+</widget>
