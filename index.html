@@ -9,9 +9,10 @@
   <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
+<div class="notify hide"><span id="notification" class="glow">---</span></div>
 <!-- PAGE 'loading_page' -->
 <!-- ===================================================== -->
-<section id="loading_page" class="page">
+<section id="loading_page" class="page active_page">
 	<div class="content padding5px">
 		<img src="assets/images/Skycable_logo.gif">
 		<img src="assets/images/loader.gif">
@@ -26,12 +27,15 @@
 <!-- ===================================================== -->
 <section id="channel_list_page" class="page hide">
 	<header>
-		<h1>Channels</h1>				
+		<div class="inline_block hleft">
+			<button data-href="#pin_list_page" class="list_button"><img style="width:90%;" src="assets/images/pin_white.png"/></button>
+		</div>	
 		<div class="inline_block hright">
 			<button class="exit list_button" href="#">Exit</button>
 		</div>
 	</header>
 	<div class="content">
+		<h1>Channels</h1>
 		<ul id="channel_list" class="listview"></ul>
 	</div>
 </section>
@@ -43,17 +47,19 @@
 <!-- ===================================================== -->
 <section id="date_list_page" class="page hide">
 	<header>
-		<h1>---</h1>
 		<div class="inline_block hleft">
 			<button data-href="#channel_list_page" class="list_button back">Back</button>
 		</div>				
 		<div class="inline_block hright">
-			<button class="exit list_button" href="#">Exit</button>
+			<button class="exit list_button">Exit</button>
 		</div>
 	</header>
 	<div class="content">
+		<h1>---</h1>
 		<ul id="date_list" class="listview"></ul>
-		<button data-href="#channel_list_page" class="list_button back">Back</button>
+		<button data-href="#channel_list_page" class="list_button back">
+			<img src="assets/images/back_white.png"/>
+		</button>
 	</div>
 </section>
 <!-- ===================================================== -->
@@ -65,17 +71,74 @@
 <!-- ===================================================== -->
 <section id="sched_list_page" class="page hide">
 	<header>
-		<h1>---</h1>
 		<div class="inline_block hleft">
 			<button data-href="#date_list_page" class="list_button sched_list_back_button back">Back</button>
 		</div>				
 		<div class="inline_block hright">
-			<button class="exit list_button" href="#">Exit</button>
+			<button class="exit list_button">Exit</button>
 		</div>
 	</header>
 	<div class="content">
+		<h1 class="align-c">---</h1>
 		<ul id="sched_list" class="listview hide"></ul>
-		<button data-href="#date_list_page" class="list_button sched_list_back_button back">Back</button>
+		<button data-href="#date_list_page" class="list_button sched_list_back_button back">
+			<img src="assets/images/back_white.png"/>
+		</button>
+	</div>
+</section>
+<!-- ===================================================== -->
+
+
+
+<!-- PAGE 'pin_list_page' -->
+<!-- ===================================================== -->
+<section id="pin_list_page" class="page hide">
+	<header>
+		<div class="inline_block hleft">
+			<button data-href="#channel_list_page" class="list_button sched_list_back_button back">Home</button>
+		</div>				
+		<div class="inline_block hright">
+			<button class="exit list_button">Exit</button>
+		</div>
+	</header>
+	<div class="content">
+		<h1>Pinned <img src="assets/images/pin_grey.png" style="vertical-align: middle;"></h1>
+		<ul id="pin_list" class="listview">
+			<li><a href="#pin_program_list_page" class="page_link">07/09/12 <small>Mon</small></a></li>
+		</ul>
+		<button data-href="#date_list_page" class="list_button sched_list_back_button back">Home</button>
+	</div>
+</section>
+<!-- ===================================================== -->
+
+<!-- PAGE 'pin_program_list_page' -->
+<!-- ===================================================== -->
+<section id="pin_program_list_page" class="page hide">
+	<header>
+		<div class="inline_block hleft">
+			<button data-href="#pin_list_page" class="list_button sched_list_back_button back">Back</button>
+		</div>				
+		<div class="inline_block hright">
+			<button class="exit list_button">Exit</button>
+		</div>
+	</header>
+	<div class="content">
+		<h1>07/09/12 <img src="assets/images/pin_grey.png" style="vertical-align: middle;"></h1>
+		<ul id="pin_program_list" class="listview">
+			<li>
+				<time class="valign-top">2:00 PM</time>
+				<span class="title valign-top">DOG WHISPERER</span>
+				<div class="channel">NATIONAL GEOGRAPHIC</div>
+			</li>	
+			<li>
+				<time class="valign-top">2:00 PM</time>
+				<span class="title valign-top">DOG WHISPERER</span>
+				<div class="channel">NATIONAL GEOGRAPHIC</div>
+			</li>	
+		</ul>
+		<button data-href="#pin_list_page" class="list_button sched_list_back_button back">
+			<img src="assets/images/back_white.png"/>
+		</button>
 	</div>
 </section>
 <!-- ===================================================== -->
@@ -83,11 +146,16 @@
 
 <section id="menu_con" class="trans glow">
 		<div class="inline_block"><a href="#" id="menu_cannellist_link"><img src="assets/images/hdpi.png"></a></div>
-		<div class="inline_block"><a href="#" class="exit" style="padding: 20px 0;">EXIT</a></div>	
-		<div  id="sked_refresh_con"><a href="#" id="sked_refresh">Refresh Schedules</a></div>	
+		<div class="inline_block"><a href="#" class="exit" style="padding: 20px 0;">EXIT</a></div>			
+		<div  id="show_pins_con">
+			<a href="#" id="show_pins"><img src="assets/images/pin_grey.png">Pinned Programs</a>
+		</div>
+		<div  id="sked_refresh_con">
+			<a href="#" id="sked_refresh"><img src="assets/images/refresh_grey.png">Refresh Schedules</a>
+		</div>	
 </section>
 
-<script src="phonegap.js"></script>
+<!-- <script src="phonegap.js"></script> -->
 <script src="assets/js/zepto.min.js"></script>
 <script src="assets/js/app.js"></script> 
 <script>
@@ -102,6 +170,14 @@ document.addEventListener('deviceready', function () {
 		<time class="inline_block time valign-top">{time}</time><div class="inline_block title valign-top">{title}</div>
 		<div class="desc">
 			{desc}
+		</div>
+	</li>
+</script>
+<script id="pinned_program_tpl" type="text/html">
+	<li>
+		<time class="inline_block valign-top">{time}</time><div class="inline_block channel valign-top">{channel}</div>
+		<div class="title">
+			{title}
 		</div>
 	</li>
 </script>

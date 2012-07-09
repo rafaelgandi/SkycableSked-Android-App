@@ -1,6 +1,6 @@
 /* 
 	Skycable Base Object
-	LM: 07-03-12
+	LM: 07-09-12
 */
 (function (window, document, z) {
 	var $PAGES = z('section.page'), // used in Ui
@@ -9,7 +9,6 @@
 		DBLTAP = 'doubleTap ',
 		SKYCABLE_SCHEDULES = {},
 		doneBuildingChannelList = false,
-		SCHEDULE_FILE = '/mnt/sdcard/Raffy/skycable.json',
 		pagePosition = {},
 		SCHEDULES_DATA_URI = 'http://rafaelgandi.phpfogapp.com/scraper/?url=http://dl.dropbox.com/u/53834631/Skycable%20Scraper/skycable.json'; 
 	
@@ -42,9 +41,7 @@
 		'STAR SPORTS':32,
 		'STAR WORLD':48,
 		'TLC':120,
-		'VELVET':53,
-		'ZOE TV':161,
-		'UNIVERSAL CHANNEL':21
+		'VELVET':53
 	};
 	
 	
@@ -57,9 +54,13 @@
 				$page.data('sent', JSON.stringify({
 					'data': _data
 				}));	
-			}				
+			}
+			
+			/**/
 			$PAGES.addClass('hide').removeClass('active_page');	
 			$page.removeClass('hide').addClass('active_page');
+			/**/		
+			
 			Ui.currentPage = $page;	
 			$root.trigger(_page.replace(/#/ig, ''), [_data, $page]);
 			$root.trigger('afterpagechange', [$page]);
