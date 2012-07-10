@@ -8,6 +8,7 @@
 		TAP = 'tap',
 		DBLTAP = 'doubleTap ',
 		SKYCABLE_SCHEDULES = {},
+		PINNED_SCHEDULES = {},
 		doneBuildingChannelList = false,
 		pagePosition = {},
 		SCHEDULES_DATA_URI = 'http://rafaelgandi.phpfogapp.com/scraper/?url=http://dl.dropbox.com/u/53834631/Skycable%20Scraper/skycable.json'; 
@@ -41,7 +42,9 @@
 		'STAR SPORTS':32,
 		'STAR WORLD':48,
 		'TLC':120,
-		'VELVET':53
+		'VELVET':53,
+		'ZOE TV':161,
+		'UNIVERSAL CHANNEL':21
 	};
 	
 	
@@ -152,15 +155,18 @@
 					success: function (res) {						
 						if (Util.setStoredSkedValue(res)) {
 							localStorage.removeItem('skycable');
+							localStorage.removeItem('skycable_pinned');
 							localStorage.setItem('skycable', res);
+							localStorage.setItem('skycable_pinned', '{}');
 							_callback(false);
 						}
 						else {	_callback(true); }	
 					}
 				});				
 			}
-			else {				
-				_callback(!Util.setStoredSkedValue(localStorage.getItem('skycable')));
+			else {	
+				PINNED_SCHEDULES = JSON.parse(localStorage.getItem('skycable_pinned') || {});
+				_callback(!Util.setStoredSkedValue(localStorage.getItem('skycable')));			
 			}		
 		},
 		
@@ -220,7 +226,24 @@
 				}
 				return elems[_selector];
 			};			
-		})()
+		})(),
+		
+		confirm: function (_o) {
+			if (typeof navigator.notification.confirm !== 'undefined') {
+				navigator.notification.confirm(
+					_o.message,
+					function (button) {
+						_o.callback.call(this, button);
+					},
+					_o.title, _o.buttons
+				);
+			}
+			else { // old fashioned
+				if (confirm(_o.message)) {	
+					_o.callback.call(this, false);
+				}
+			}
+		}
 	};
 	
 	window.Skycable = {		
@@ -252,8 +275,7 @@
 				}
 				else {
 					html += '<li><a href="#sched_list_page" data-send=\'{"channelName":"'+_channelName+'","date":"'+p+'"}\' class="page_link channel_link">'+p+'<small>'+Util.getDayName(p)+'</small></a></li>';
-				}
-				
+				}				
 			}
 			Util.getElementFromCache('#date_list').html(html).removeClass('hide');	
 		},
@@ -282,7 +304,8 @@
 						html += schedTemplate
 									.replace('{time}', scheds[i].time)
 									.replace('{title}', scheds[i].title)
-									.replace('{desc}', scheds[i].desc);
+									.replace('{desc}', scheds[i].desc)
+									.replace('{meta}', scheds[i].time+'|'+scheds[i].title+'|'+_channelName+'|'+_date);
 					}
 					break;
 				}
@@ -297,6 +320,168 @@
 			catch(e) {
 				alert('ERROR: navigator.app.exitApp() - '+e.toString());
 				navigator.device.exitApp();
+			}
+		},
+		
+		notify: (function () {
+			var timer;
+			return function (_msg) {
+				clearTimeout(timer);
+				Util.getElementFromCache('#notification').show();
+				Util.getElementFromCache('#notification span').html(_msg);
+				timer = setTimeout(function () {
+					Util.getElementFromCache('#notification').animate({opacity: 0}, {
+						duration: 300,
+						complete: function () {
+							Util.getElementFromCache('#notification span').html('---');
+							Util.getElementFromCache('#notification').hide();
+						}
+					});
+				}, 3e3);
+			};
+		})(),
+		
+		Pin: {
+			refresh: function () {
+				localStorage.setItem('skycable_pinned', JSON.stringify(PINNED_SCHEDULES));
+			},
+			
+			add: function (_metaData) {
+				var meta = _metaData.split('|'),
+					date = new Date();
+				if (!(meta[3] in PINNED_SCHEDULES)) {
+					PINNED_SCHEDULES[meta[3]] = [];					
+				}
+				PINNED_SCHEDULES[meta[3]].push({
+					'time': meta[0],
+					'title': meta[1],
+					'channel': meta[2],
+					'id': date.getTime()
+				});
+				Skycable.Pin.refresh();				
+			},
+			
+			remove: function (_date, _id) {
+				if (typeof PINNED_SCHEDULES[_date] !== 'undefined' && z.isArray(PINNED_SCHEDULES[_date])) {
+					var l = PINNED_SCHEDULES[_date].length,
+						indx = -1,
+						id = _id || false;
+					// Check to see if we are going to delete a whole set of programs
+					// by date.	
+					if (id === false) {
+						if (_date in PINNED_SCHEDULES) {
+							delete PINNED_SCHEDULES[_date];
+							Skycable.Pin.refresh();
+							return 2;
+						}
+					}						
+					for (var i=0; i < l; i++) {
+						if (parseInt(PINNED_SCHEDULES[_date][i].id, 10) === parseInt(id, 10)) {							
+							// Do array deletion here //
+							// See: http://wolfram.kriesing.de/blog/index.php/2008/javascript-remove-element-from-array
+							// See: http://viralpatel.net/blogs/javascript-array-remove-element-js-array-delete-element/
+							indx = PINNED_SCHEDULES[_date].indexOf(PINNED_SCHEDULES[_date][i]);
+							if (indx !== -1) {
+								PINNED_SCHEDULES[_date].splice(indx, 1);
+								Skycable.Pin.refresh();	
+								break;
+							}						
+						}
+					}
+					// If there are no more programs under this date 
+					// then remove this date as well.
+					if (PINNED_SCHEDULES[_date].length <= 0) {
+						delete PINNED_SCHEDULES[_date];
+						Skycable.Pin.refresh();
+						return 2;
+					}
+					Skycable.Pin.refresh();
+					return 1;
+				}
+			},
+			
+			populatePinnedDates: function () {
+				var html = '';
+				for (var date in PINNED_SCHEDULES) {
+					html += '<li><a href="#pin_program_list_page" class="page_link" data-send=\'{"pin_date":"'+date+'"}\'>'+date+'</a></li>';
+				}
+				/* if (z.trim(html) === '') {
+					if (!Util.getElementFromCache('#pin_list').next('em').length) {
+						Util.getElementFromCache('#pin_list').after('<em>None pinned yet.</em>');
+					}			
+					return;
+				} */
+				Util.getElementFromCache('#pin_list').html(html);
+			},
+			
+			populatePinnedProgramForDate: function (_date) {
+				var html = '',
+					tpl = Util.getElementFromCache('#pinned_program_tpl').html();
+				if (_date in PINNED_SCHEDULES) {
+					z.each(PINNED_SCHEDULES[_date], function () {
+						html += tpl.replace('{time}', this.time)
+								   .replace('{title}', this.title)
+								   .replace('{channel}', this.channel)
+								   .replace('{date}', _date)
+								   .replace('{id}', this.id);
+					});
+					Util.getElementFromCache('#pin_program_list').html(html);
+				}
+			},
+			
+			initEvents: function () {				
+				// Show pins on the menu button //
+				z('#show_pins').on(TAP, function (e) {
+					e.preventDefault();
+					Ui.gotoPage('#pin_list_page');
+				});				
+				// Adding pins on programs //
+				$root.on('longTap', '#sched_list li', function (e) {
+					var that = this;					
+					Util.confirm({
+						message: 'Do you want to pin this program?',
+						callback: function (button) {
+							if (button === 1 || button === false) {
+								Skycable.Pin.add(that.getAttribute('data-meta'));																						
+							}
+						},
+						title: 'Pin',
+						buttons: 'Yep,Nope'
+					});
+					Skycable.notify('Pin added!');
+				});
+				
+				$root.on('longTap', '#pin_list li a', function (e) {
+					var date = JSON.parse(this.getAttribute('data-send')).pin_date;				
+					Util.confirm({
+						message: 'Unpin all programs from this date?',
+						callback: function (button) {
+							if (button === 1 || button === false) {
+								Skycable.Pin.remove(date);
+								Ui.gotoPage('#pin_list_page');																							
+							}
+						},
+						title: 'Unpin all programs from '+date,
+						buttons: 'Yep,Nope'
+					});
+				});
+				
+				$root.on('longTap', '#pin_program_list li', function () {
+					var that = this;
+					Util.confirm({
+						message: 'Unpin this program?',
+						callback: function (button) {
+							if (button === 1 || button === false) {
+								if (Skycable.Pin.remove(that.getAttribute('data-pin-date'), that.getAttribute('data-pin-id')) === 1) {
+									Skycable.Pin.populatePinnedProgramForDate(that.getAttribute('data-pin-date'));
+								}
+								else { Ui.gotoPage('#pin_list_page'); }																	
+							}
+						},
+						title: 'Unpin',
+						buttons: 'Yep,Nope'
+					});					
+				});
 			}
 		},
 		
@@ -328,6 +513,15 @@
 			$root.on('sched_list_page', function (e, _data) {
 				Util.getElementFromCache('#sched_list_page h1').html(_data.channelName+'<br> <small>('+_data.date+')</small>');
 				Skycable.populateSchedListForChannel(_data.channelName, _data.date);						
+			});
+			
+			$root.on('pin_list_page', function (e, _data) {
+				Skycable.Pin.populatePinnedDates();
+			});
+			
+			$root.on('pin_program_list_page', function (e, _data) {
+				Util.getElementFromCache('#pin_program_list_page h1').html(_data.pin_date);
+				Skycable.Pin.populatePinnedProgramForDate(_data.pin_date);
 			});
 			
 			// Remember the previous positions of each page //
@@ -396,30 +590,26 @@
 						}
 						Ui.gotoPage('#channel_list_page');						
 					}, true);		
-				};
-				
-				if (typeof navigator.notification.confirm !== 'undefined') {
-					navigator.notification.confirm(
-						'Do you really want to refresh the schedules?',
-						function (button) {
-							if (button === 1) {
-								_doRefreshing();
-							}
-						},
-						'Refresh Schedules',
-						'Yep,Nope'
-					);
-				}
-				else { // old fashioned
-					if (confirm('Do you really want to refresh the schedules?')) {	
-						_doRefreshing();		
-					}
-				}					
+				};				
+				Util.confirm({
+					message: 'Do you really want to refresh the schedules?',
+					callback: function (button) {
+						if (button === 1 || button === false) {
+							_doRefreshing();																						
+						}
+					},
+					title: 'Refresh Schedules',
+					buttons: 'Yep,Nope'
+				});										
 			});
 			
 			$root.on('focus', 'a, button', function () {
 				z(this).blur();
-			});
+			});			
+			
+			// initialize pins events //
+			Skycable.Pin.initEvents();
+			
 		},
 		
 		init: function () {
@@ -429,6 +619,7 @@
 					// Run the required events //
 					Skycable.initEvents(); 					
 					Ui.gotoPage('#channel_list_page');
+					Skycable.notify('hellow :)');
 				}
 				else {
 					alert('Oh no! I can\'t seem to get the schedules. Sorry.');

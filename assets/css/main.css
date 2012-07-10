@@ -407,6 +407,7 @@ footer {
 }
 
 #pin_program_list {
+	margin-top: 10px;
 	margin-bottom: 10px;
 }
 
@@ -428,6 +429,7 @@ footer {
 	color: #999;
 	font-size: 13px;
 	padding-bottom: 5px;
+	padding-right: 5px;
 }
 
 
@@ -448,7 +450,7 @@ footer {
 	color: #FF8A00;
 	display: block;
 	margin: 0 auto;
-	padding: 8px;
+	padding: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 	font-weight: bold;

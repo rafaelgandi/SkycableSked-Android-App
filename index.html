@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
-<div class="notify hide"><span id="notification" class="glow">---</span></div>
+<div id="notification" class="notify hide"><span class="glow">---</span></div>
 <!-- PAGE 'loading_page' -->
 <!-- ===================================================== -->
 <section id="loading_page" class="page active_page">
@@ -103,13 +103,13 @@
 	</header>
 	<div class="content">
 		<h1>Pinned <img src="assets/images/pin_grey.png" style="vertical-align: middle;"></h1>
-		<ul id="pin_list" class="listview">
-			<li><a href="#pin_program_list_page" class="page_link">07/09/12 <small>Mon</small></a></li>
-		</ul>
-		<button data-href="#date_list_page" class="list_button sched_list_back_button back">Home</button>
+		<ul id="pin_list" class="listview"></ul>
+		<button data-href="#channel_list_page" class="list_button sched_list_back_button back">Home</button>
 	</div>
 </section>
 <!-- ===================================================== -->
+
+
 
 <!-- PAGE 'pin_program_list_page' -->
 <!-- ===================================================== -->
@@ -123,19 +123,8 @@
 		</div>
 	</header>
 	<div class="content">
-		<h1>07/09/12 <img src="assets/images/pin_grey.png" style="vertical-align: middle;"></h1>
-		<ul id="pin_program_list" class="listview">
-			<li>
-				<time class="valign-top">2:00 PM</time>
-				<span class="title valign-top">DOG WHISPERER</span>
-				<div class="channel">NATIONAL GEOGRAPHIC</div>
-			</li>	
-			<li>
-				<time class="valign-top">2:00 PM</time>
-				<span class="title valign-top">DOG WHISPERER</span>
-				<div class="channel">NATIONAL GEOGRAPHIC</div>
-			</li>	
-		</ul>
+		<h1>---</h1>
+		<ul id="pin_program_list" class="listview"></ul>
 		<button data-href="#pin_list_page" class="list_button sched_list_back_button back">
 			<img src="assets/images/back_white.png"/>
 		</button>
@@ -166,7 +155,7 @@ document.addEventListener('deviceready', function () {
 </script>
 
 <script id="sched_tpl" type="text/html">
-	<li>
+	<li data-meta="{meta}">
 		<time class="inline_block time valign-top">{time}</time><div class="inline_block title valign-top">{title}</div>
 		<div class="desc">
 			{desc}
@@ -174,12 +163,11 @@ document.addEventListener('deviceready', function () {
 	</li>
 </script>
 <script id="pinned_program_tpl" type="text/html">
-	<li>
-		<time class="inline_block valign-top">{time}</time><div class="inline_block channel valign-top">{channel}</div>
-		<div class="title">
-			{title}
-		</div>
-	</li>
+	<li data-pin-id="{id}" data-pin-date="{date}">
+		<time class="valign-top">{time}</time>
+		<span class="title valign-top">{title}</span>
+		<div class="channel">{channel}</div>
+	</li>	
 </script>
 </body>
 </html>
