@@ -235,11 +235,27 @@
 					_o.title, _o.buttons
 				);
 			}
-			else { // old fashioned
-				if (confirm(_o.message)) {	
-					_o.callback.call(this, false);
-				}
+			else { // old fashioned			
+				_o.callback.call(this, confirm(_o.message));
 			}
+		},
+		
+		findPos: function (obj) {
+			// See: http://clifgriffin.com/2008/10/14/using-javascript-to-scroll-to-a-specific-elementobject/
+			var curtop = 0;
+			if (obj.offsetParent) {
+				do {
+					curtop += obj.offsetTop;
+				} while (obj = obj.offsetParent);
+			return curtop;
+			}
+		},
+		
+		scrollTo: function (_elem) {
+			// No really sure why i need a timeout here, but it only scrolls with a timeout.
+			setTimeout(function () { 
+				self.scrollTo(0, Util.findPos(_elem));
+			}, 0);	
 		}
 	};
 	
@@ -275,7 +291,10 @@
 					html += '<li><a href="#sched_list_page" data-send=\'{"channelName":"'+_channelName+'","date":"'+p+'"}\' class="page_link channel_link">'+p+'<small>'+Util.getDayName(p)+'</small></a></li>';
 				}				
 			}
-			Util.getElementFromCache('#date_list').html(html).removeClass('hide');	
+			Util.getElementFromCache('#date_list').html(html).removeClass('hide');
+			if (Util.getElementFromCache('#date_list').find('li.today').length) {								
+				Util.scrollTo(Util.getElementFromCache('#date_list').find('li.today')[0]);	
+			}	
 		},
 		
 		populateSchedListForChannel: function (_channelName, _date) {
@@ -405,8 +424,8 @@
 					Util.getElementFromCache('#pin_list').html('');
 					return;
 				}
-				for (var date in PINNED_SCHEDULES) {
-					html += '<li><a href="#pin_program_list_page" class="page_link" data-send=\'{"pin_date":"'+date+'"}\'>'+date+'</a></li>';
+				for (var date in PINNED_SCHEDULES) {					
+					html += '<li '+((Util.today.dateFormatted == date) ? 'class="today"' : '')+'><a href="#pin_program_list_page" class="page_link" data-send=\'{"pin_date":"'+date+'"}\'>'+date+'</a></li>';
 				}
 				if (z.trim(html) === '') {
 					Skycable.notify('There are no pinned programs.');	
@@ -437,14 +456,14 @@
 					Ui.gotoPage('#pin_list_page');
 				});				
 				// Adding pins on programs //
-				$root.on('longTap', '#sched_list li', function (e) {
+				$root.on(DBLTAP, '#sched_list li', function (e) {
 					var that = this,
 						$me = z(that);
 					$me.addClass('hlight');
 					Util.confirm({
 						message: 'Do you want to pin this program?',
 						callback: function (button) {
-							if (button === 1 || button === false) {
+							if (button === 1 || button === true) {
 								Skycable.Pin.add(that.getAttribute('data-meta'));
 								Skycable.notify('Pin added!');
 							}
@@ -460,7 +479,7 @@
 					Util.confirm({
 						message: 'Unpin all programs from this date?',
 						callback: function (button) {
-							if (button === 1 || button === false) {
+							if (button === 1 || button === true) {
 								Skycable.Pin.remove(date);
 								Ui.gotoPage('#pin_list_page');
 								Skycable.notify('Unpinned all programs from date '+date);
@@ -476,7 +495,7 @@
 					Util.confirm({
 						message: 'Unpin this program?',
 						callback: function (button) {
-							if (button === 1 || button === false) {
+							if (button === 1 || button === true) {
 								if (Skycable.Pin.remove(that.getAttribute('data-pin-date'), that.getAttribute('data-pin-id')) === 1) {
 									Skycable.Pin.populatePinnedProgramForDate(that.getAttribute('data-pin-date'));
 								}
@@ -599,7 +618,7 @@
 				Util.confirm({
 					message: 'Do you really want to refresh the schedules?',
 					callback: function (button) {
-						if (button === 1 || button === false) {
+						if (button === 1 || button === true) {
 							_doRefreshing();																						
 						}
 					},
