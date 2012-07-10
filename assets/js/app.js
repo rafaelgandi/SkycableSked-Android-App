@@ -244,7 +244,8 @@
 	};
 	
 	window.Skycable = {		
-		root: $root,			
+		root: $root,
+		
 		populateChannelList: function () {
 			if (doneBuildingChannelList) {return;}
 			doneBuildingChannelList = true;
@@ -389,8 +390,7 @@
 					// then remove this date as well.
 					if (PINNED_SCHEDULES[_date].length <= 0) {
 						delete PINNED_SCHEDULES[_date];
-						Skycable.Pin.refresh();
-						console.dir(PINNED_SCHEDULES);						
+						Skycable.Pin.refresh();										
 						return 2;
 					}
 					Skycable.Pin.refresh();
@@ -438,18 +438,21 @@
 				});				
 				// Adding pins on programs //
 				$root.on('longTap', '#sched_list li', function (e) {
-					var that = this;					
+					var that = this,
+						$me = z(that);
+					$me.addClass('hlight');
 					Util.confirm({
 						message: 'Do you want to pin this program?',
 						callback: function (button) {
 							if (button === 1 || button === false) {
-								Skycable.Pin.add(that.getAttribute('data-meta'));																						
+								Skycable.Pin.add(that.getAttribute('data-meta'));
+								Skycable.notify('Pin added!');
 							}
+							$me.removeClass('hlight');
 						},
 						title: 'Pin',
 						buttons: 'Yep,Nope'
-					});
-					Skycable.notify('Pin added!');
+					});					
 				});
 				// Batch remove pins on programs by date //
 				$root.on('longTap', '#pin_list li a', function (e) {
@@ -488,8 +491,7 @@
 			}
 		},
 		
-		initEvents: function () {
-			
+		initEvents: function () {			
 			// Set the scroll offset position to 0 default value
 			$PAGES.each(function () { pagePosition[this.id] = 0; });
 		

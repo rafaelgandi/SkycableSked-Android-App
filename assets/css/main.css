@@ -129,10 +129,6 @@ a:link {
 	padding: 5px !important;
 }
 
-.active_page {
-	
-}
-
 .page {
 	padding: 0;
 	margin: 0;
@@ -297,9 +293,10 @@ footer {
 }
 
 #sched_list li {
+	-webkit-transition: all 1.5s linear 0s;
+	transition: all 1.5s linear 0s;
 	padding: 3px;
 }
-
 
 #channel_list,
 #date_list,
