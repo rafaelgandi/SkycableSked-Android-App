@@ -1,6 +1,6 @@
 /* 
 	Skycable Base Object
-	LM: 07-10-12
+	LM: 07-11-12
 */
 (function (window, document, z) {
 	var $PAGES = z('section.page'), // used in Ui
