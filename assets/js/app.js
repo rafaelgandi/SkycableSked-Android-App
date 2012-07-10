@@ -57,13 +57,9 @@
 				$page.data('sent', JSON.stringify({
 					'data': _data
 				}));	
-			}
-			
-			/**/
+			}			
 			$PAGES.addClass('hide').removeClass('active_page');	
 			$page.removeClass('hide').addClass('active_page');
-			/**/		
-			
 			Ui.currentPage = $page;	
 			$root.trigger(_page.replace(/#/ig, ''), [_data, $page]);
 			$root.trigger('afterpagechange', [$page]);
@@ -117,8 +113,7 @@
 	};
 	
 	
-	var Util = {
-		
+	var Util = {		
 		setStoredSkedValue: function (_res) {
 			var r, err = false;					
 			try { r = JSON.parse(_res); }
@@ -158,6 +153,8 @@
 							localStorage.removeItem('skycable_pinned');
 							localStorage.setItem('skycable', res);
 							localStorage.setItem('skycable_pinned', '{}');
+							PINNED_SCHEDULES = {};
+							Skycable.notify('New set of schedules have been downloaded! :)');
 							_callback(false);
 						}
 						else {	_callback(true); }	
@@ -327,8 +324,8 @@
 			var timer;
 			return function (_msg) {
 				clearTimeout(timer);
-				Util.getElementFromCache('#notification').show();
 				Util.getElementFromCache('#notification span').html(_msg);
+				Util.getElementFromCache('#notification').show().css({opacity:0.9});				
 				timer = setTimeout(function () {
 					Util.getElementFromCache('#notification').animate({opacity: 0}, {
 						duration: 300,
@@ -342,7 +339,7 @@
 		})(),
 		
 		Pin: {
-			refresh: function () {
+			refresh: function () { // refresh/update the stored pin data
 				localStorage.setItem('skycable_pinned', JSON.stringify(PINNED_SCHEDULES));
 			},
 			
@@ -393,6 +390,7 @@
 					if (PINNED_SCHEDULES[_date].length <= 0) {
 						delete PINNED_SCHEDULES[_date];
 						Skycable.Pin.refresh();
+						console.dir(PINNED_SCHEDULES);						
 						return 2;
 					}
 					Skycable.Pin.refresh();
@@ -402,15 +400,18 @@
 			
 			populatePinnedDates: function () {
 				var html = '';
+				if (Util.isEmptyObject(PINNED_SCHEDULES)) {
+					Skycable.notify('There are no pinned programs.');	
+					Util.getElementFromCache('#pin_list').html('');
+					return;
+				}
 				for (var date in PINNED_SCHEDULES) {
 					html += '<li><a href="#pin_program_list_page" class="page_link" data-send=\'{"pin_date":"'+date+'"}\'>'+date+'</a></li>';
 				}
-				/* if (z.trim(html) === '') {
-					if (!Util.getElementFromCache('#pin_list').next('em').length) {
-						Util.getElementFromCache('#pin_list').after('<em>None pinned yet.</em>');
-					}			
+				if (z.trim(html) === '') {
+					Skycable.notify('There are no pinned programs.');	
 					return;
-				} */
+				}
 				Util.getElementFromCache('#pin_list').html(html);
 			},
 			
@@ -450,7 +451,7 @@
 					});
 					Skycable.notify('Pin added!');
 				});
-				
+				// Batch remove pins on programs by date //
 				$root.on('longTap', '#pin_list li a', function (e) {
 					var date = JSON.parse(this.getAttribute('data-send')).pin_date;				
 					Util.confirm({
@@ -458,14 +459,15 @@
 						callback: function (button) {
 							if (button === 1 || button === false) {
 								Skycable.Pin.remove(date);
-								Ui.gotoPage('#pin_list_page');																							
+								Ui.gotoPage('#pin_list_page');
+								Skycable.notify('Unpinned all programs from date '+date);
 							}
 						},
 						title: 'Unpin all programs from '+date,
 						buttons: 'Yep,Nope'
 					});
 				});
-				
+				// Unpin a program //
 				$root.on('longTap', '#pin_program_list li', function () {
 					var that = this;
 					Util.confirm({
@@ -475,7 +477,8 @@
 								if (Skycable.Pin.remove(that.getAttribute('data-pin-date'), that.getAttribute('data-pin-id')) === 1) {
 									Skycable.Pin.populatePinnedProgramForDate(that.getAttribute('data-pin-date'));
 								}
-								else { Ui.gotoPage('#pin_list_page'); }																	
+								else { Ui.gotoPage('#pin_list_page'); }	
+								Skycable.notify('Program unpinned');
 							}
 						},
 						title: 'Unpin',
@@ -618,8 +621,7 @@
 				if (!_err) {
 					// Run the required events //
 					Skycable.initEvents(); 					
-					Ui.gotoPage('#channel_list_page');
-					Skycable.notify('hellow :)');
+					Ui.gotoPage('#channel_list_page');					
 				}
 				else {
 					alert('Oh no! I can\'t seem to get the schedules. Sorry.');
