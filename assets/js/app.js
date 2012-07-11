@@ -94,16 +94,26 @@
 			var hLight = function (_e, _cssClass) {
 				var etype = _e.type.toLowerCase(),
 					$me = z(_e.Element);
-				if (etype === 'touchstart') {
-					$me.addClass(_cssClass);
-				}
-				else if (etype === 'touchmove' || etype === 'touchend') {
-					$me.removeClass(_cssClass);
-				}			
+				if (typeof _e.anchor === 'undefined') {
+					if (etype === 'touchstart') {
+						$me.addClass(_cssClass);
+					}
+					else if (etype === 'touchmove' || etype === 'touchend') {
+						$me.removeClass(_cssClass);
+					}	
+				}	
+				else {
+					if (etype === 'touchend') {
+						$me.addClass(_cssClass);
+						setTimeout(function () {
+							$me.removeClass(_cssClass);
+						}, 300);
+					}
+				}		
 			};
 			
 			$root.on('touchstart touchmove touchend', 'a', function (e) {
-				hLight(z.extend(e, {'Element': this}), 'hlight');
+				hLight(z.extend(e, {'Element': this, 'anchor': true}), 'hlight');
 			});
 			
 			$root.on('touchstart touchmove touchend', 'button', function (e) {			
