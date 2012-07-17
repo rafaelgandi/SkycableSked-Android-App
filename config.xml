@@ -2,15 +2,15 @@
     <widget xmlns = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id        = "com.skycable.schedules"
-        versionCode="8" 
-        version   = "0.0.8">
+        versionCode="9" 
+        version   = "0.0.9">
 
     <!-- versionCode is optional and Android only -->
 
     <name>SkyCable Sked</name>
 
     <description>
-       Skycable program schedule reader. LM: 07-11-12
+       Skycable program schedule reader. LM: 07-17-12
     </description>
 
     <author href="http://www.rafaelgandi.tk" email="rafaelgandi@gmail.com">

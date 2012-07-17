@@ -334,7 +334,7 @@
 				navigator.notification.alert(
 					'Aw snap, no schedules available for this date',
 					function () {},
-					'Oop, no sched :(',
+					'Oops, no sched :(',
 					'Ayt'
 				);
 				Util.getElementFromCache('#sched_list_page').find('button.sched_list_back_button').trigger(TAP);
@@ -603,16 +603,25 @@
 			});
 			
 			// Back buttons //
-			var goBackHandler = function () {
+			var goBackHandler = function (e) {
 				var $backButton = (!!Ui.currentPage)
 									? Util.getElementFromCache('#'+Ui.currentPage[0].id+' button.back')
 									: z('section.active_page').find('button.back');					
 				if ($backButton.length) {
 					$backButton.trigger(TAP);
-				}				
+				}
 			};
-			document.addEventListener('backbutton', goBackHandler, false);
-			$root.on('swipeRight', goBackHandler);
+			document.addEventListener('backbutton', goBackHandler, false);			
+			// See: http://eightmedia.github.com/hammer.js/
+			new Hammer(document.body, { // Swipe right
+				drag_vertical: false,
+				drag_min_distance: 110
+			})
+			.ondragstart = function (e) {				
+				if (e.direction === 'right' && Math.ceil(Math.abs(e.angle)) < 38) {
+					goBackHandler(e);
+				}
+			};
 			
 			// Menu button //
 			document.addEventListener('menubutton', function () {
