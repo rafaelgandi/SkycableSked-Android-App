@@ -1,6 +1,6 @@
 /* 
 	Skycable Base Object
-	LM: 07-11-12
+	LM: 07-17-12
 */
 (function (window, document, z) {
 	var $PAGES = z('section.page'), // used in Ui
@@ -42,11 +42,8 @@
 		'STAR SPORTS':32,
 		'STAR WORLD':48,
 		'TLC':120,
-		'VELVET':53,
-		'ZOE TV':161,
-		'UNIVERSAL CHANNEL':21
+		'VELVET':53
 	};
-	
 	
 	var Ui = {
 		currentPage: null,
@@ -266,7 +263,31 @@
 			setTimeout(function () { 
 				self.scrollTo(0, Util.findPos(_elem));
 			}, 0);	
-		}
+		},
+		
+		sortTime: (function () {
+			var cache = {};				
+			return function (_arr) {
+				var date = Util.today.dateFormatted;
+				_arr.sort(function (a, b) {
+					var akey = date+' '+a.time,
+						bkey = date+' '+b.time;
+					if (!(akey in cache)) {
+						cache[akey] = (new Date(akey)).getTime();
+					}
+					if (!(bkey in cache)) {
+						cache[bkey] = (new Date(bkey)).getTime();
+					}
+					var aTime = cache[akey], bTime = cache[bkey];
+					aTime = (isNaN(aTime)) ? 0 : aTime;	
+					bTime = (isNaN(bTime)) ? 0 : bTime;						
+					return (aTime < bTime) 
+								? -1
+								: (aTime > bTime) ? 1 : 0;
+				});
+				return _arr;
+			};
+		})()
 	};
 	
 	window.Skycable = {		
@@ -278,7 +299,7 @@
 			var html = '',
 				$channelList = Util.getElementFromCache('#channel_list');
 			for (var p in _CHANNELS) {
-				html += '<li><a href="#date_list_page" data-send=\'{"channel":"'+_CHANNELS[p]+'","name":"'+p+'"}\' class="page_link channel_link">'+p+'</a></li>';
+				html += '<li><a href="#date_list_page" data-send=\'{"channel":"'+_CHANNELS[p]+'","name":"'+p+'","from":"channel"}\' class="page_link channel_link">'+p+'</a></li>';
 			}
 			if ($channelList.length) {
 				$channelList.html(html);
@@ -301,10 +322,7 @@
 					html += '<li><a href="#sched_list_page" data-send=\'{"channelName":"'+_channelName+'","date":"'+p+'"}\' class="page_link channel_link">'+p+'<small>'+Util.getDayName(p)+'</small></a></li>';
 				}				
 			}
-			Util.getElementFromCache('#date_list').html(html).removeClass('hide');
-			if (Util.getElementFromCache('#date_list').find('li.today').length) {								
-				Util.scrollTo(Util.getElementFromCache('#date_list').find('li.today')[0]);	
-			}	
+			Util.getElementFromCache('#date_list').html(html).removeClass('hide');			
 		},
 		
 		populateSchedListForChannel: function (_channelName, _date) {
@@ -385,6 +403,7 @@
 					'channel': meta[2],
 					'id': date.getTime()
 				});
+				PINNED_SCHEDULES[meta[3]] = Util.sortTime(PINNED_SCHEDULES[meta[3]]);
 				Skycable.Pin.refresh();				
 			},
 			
@@ -542,7 +561,13 @@
 				Util.getElementFromCache('button.sched_list_back_button').attr('data-send', JSON.stringify({
 					'channel': _data.channel,
 					'name': _data.name
-				}));
+				}));				
+				// When date list page is called from channel list page, scroll to date today. //
+				if (typeof _data.from !== 'undefined') {
+					if (Util.getElementFromCache('#date_list').find('li.today').length) {								
+						Util.scrollTo(Util.getElementFromCache('#date_list').find('li.today')[0]);	
+					}	
+				}
 			});		
 			$root.on('sched_list_page', function (e, _data) {
 				Util.getElementFromCache('#sched_list_page h1').html(_data.channelName+'<br> <small>('+_data.date+')</small>');
@@ -560,7 +585,7 @@
 			
 			// Remember the previous positions of each page //
 			$root.on('touchstart', 'ul.listview a', function (e) {
-				pagePosition[Ui.currentPage[0].id] = window.scrollY;
+				pagePosition[Ui.currentPage[0].id] = window.scrollY;				
 			});
 			
 			// Exit Button //
@@ -584,7 +609,7 @@
 									: z('section.active_page').find('button.back');					
 				if ($backButton.length) {
 					$backButton.trigger(TAP);
-				}
+				}				
 			};
 			document.addEventListener('backbutton', goBackHandler, false);
 			$root.on('swipeRight', goBackHandler);
