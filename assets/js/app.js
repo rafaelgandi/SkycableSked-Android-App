@@ -14,35 +14,35 @@
 		SCHEDULES_DATA_URI = 'http://rafaelgandi.phpfogapp.com/scraper/?url=http://dl.dropbox.com/u/53834631/Skycable%20Scraper/skycable.json'; 
 	
 	var _CHANNELS = {
-		'NATIONAL GEOGRAPHIC':41,
-		'AXN':49,
-		'BBC':29 ,
+		'NATIONAL GEOGRAPHIC':25,
+		'AXN':32,
+		'BBC':46 ,
 		'BIOGRAPHY':65,
-		'CNN':28,
-		'DISCOVERY CHANNEL':39,
-		'DISNEY CHANNEL':47,
-		'E!':57,
-		'ESPN':31,
-		'ETC':14,
-		'FOX CHANNEL':50,
-		'FOX CRIME':60,
-		'FX':156,
-		'AUSTRALIA NETWORK':130,
-		'HBO':54,
-		'HERO TV':44,
-		'HISTORY CHANNEL':25,
-		'JACK TV':51,
-		'KIX':63,
-		'LIFESTYLE NETWORK':52,
-		'MAX':36,
-		'MTV ASIA':71,
-		'MYX':23,
-		'SOLAR SPORTS':70,
-		'STAR MOVIES':55,
-		'STAR SPORTS':32,
-		'STAR WORLD':48,
-		'TLC':120,
-		'VELVET':53
+		'CNN':25,
+		'DISCOVERY CHANNEL':37,
+		'DISNEY CHANNEL':22,
+		'E!':51,
+		'ESPN':43,
+		'ETC':12,
+		'FOX CHANNEL':31,
+		'FOX CRIME':63,
+		'FX':86,
+		'AUSTRALIA NETWORK':116,
+		'HBO':29,
+		'HERO TV':21,
+		'HISTORY CHANNEL':64,
+		'JACK TV':42,
+		'KIX':66,
+		'LIFESTYLE NETWORK':34,
+		'MAX':49,
+		'MTV ASIA':00,
+		'MYX':39,
+		'SOLAR SPORTS':40,
+		'STAR MOVIES':26,
+		'STAR SPORTS':44,
+		'STAR WORLD':33,
+		'TLC':74,
+		'VELVET':35
 	};
 	
 	var Ui = {
@@ -299,7 +299,7 @@
 			var html = '',
 				$channelList = Util.getElementFromCache('#channel_list');
 			for (var p in _CHANNELS) {
-				html += '<li><a href="#date_list_page" data-send=\'{"channel":"'+_CHANNELS[p]+'","name":"'+p+'","from":"channel"}\' class="page_link channel_link">'+p+'</a></li>';
+				html += '<li><a href="#date_list_page" data-send=\'{"channel":"'+_CHANNELS[p]+'","name":"'+p+'","from":"channel"}\' class="page_link channel_link">'+p+' <small>'+_CHANNELS[p]+'</small></a></li>';
 			}
 			if ($channelList.length) {
 				$channelList.html(html);
