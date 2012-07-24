@@ -464,7 +464,7 @@
 					return;
 				}
 				for (var date in PINNED_SCHEDULES) {					
-					html += '<li '+((Util.today.dateFormatted == date) ? 'class="today"' : '')+'><a href="#pin_program_list_page" class="page_link" data-send=\'{"pin_date":"'+date+'"}\'>'+date+'</a></li>';
+					html += '<li '+((Util.today.dateFormatted == date) ? 'class="today"' : '')+'><a href="#pin_program_list_page" class="page_link" data-send=\'{"pin_date":"'+date+'"}\'>'+date+'<small>('+Util.getDayName(date)+')</small></a></li>';
 				}
 				if (z.trim(html) === '') {
 					Skycable.notify('There are no pinned programs.');	
@@ -589,7 +589,7 @@
 			});
 			
 			$root.on('pin_program_list_page', function (e, _data) {
-				Util.getElementFromCache('#pin_program_list_page h1').html(_data.pin_date);
+				Util.getElementFromCache('#pin_program_list_page h1').html(_data.pin_date+' <span>'+Util.getDayName(_data.pin_date)+'</span>');
 				Skycable.Pin.populatePinnedProgramForDate(_data.pin_date);
 			});
 			
