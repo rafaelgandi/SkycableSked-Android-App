@@ -2,15 +2,15 @@
     <widget xmlns = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id        = "com.skycable.schedules"
-        versionCode="9" 
-        version   = "0.0.9">
+        versionCode="0.1.0" 
+        version   = "0.1.0">
 
     <!-- versionCode is optional and Android only -->
 
     <name>SkyCable Sked</name>
 
     <description>
-       Skycable program schedule reader. LM: 07-17-12
+       Skycable program schedule reader. LM: 07-24-12
     </description>
 
     <author href="http://www.rafaelgandi.tk" email="rafaelgandi@gmail.com">
@@ -21,4 +21,7 @@
 	
 	<!-- SET TO PORTRAIT ONLY -->
 	<preference name="orientation" value="portrait" />
+	<!-- ALLOW APP TO BE MOVED TO SD CARD -->
+	<!-- See: http://developer.android.com/guide/topics/data/install-location.html -->
+	<preference name="android-installLocation" value="auto" />
 </widget>

@@ -1,4 +1,4 @@
-/* LM: 07-11-12 */
+/* LM: 07-24-12 */
 
 /* DEV STYLES (LM: 07-27-11)*/
 .hide {
@@ -231,7 +231,7 @@ footer {
 .listview li {
 	padding: 0;
 	margin: 0;
-	border-bottom: 1px solid #ccc;
+	border-bottom: 1px solid #DFDFDF;
 }
 
 .listview li:last-child {
@@ -316,10 +316,17 @@ footer {
 #channel_list li > a {
 	position: relative;
 }
+
 #channel_list small {
 	position: absolute;
 	right: 10px;
-	font-weight: normal;
+	bottom: 10px;
+	padding: 4px;
+	-webkit-border-radius: 50%;
+	border-radius: 50%;
+	background-color: #33B5E5;
+	color: #fff;
+	border: 5px solid #E2F4FB;
 }
 
 .today {
@@ -348,21 +355,23 @@ footer {
 
 #menu_con {
 	position: fixed;
-	opacity: 0.9;
-	bottom: -500px;
-	left:0px;
+	top: 135px;
+	left:-500px;
+	height: 100%;
+	opacity: 0;
 	background-color: #000;
 	display:block;
 	width: 100%;
-	color: #999;	
 	-webkit-box-shadow: 0 0 27px #000;
 	box-shadow: 0 0 27px #000;	
 	z-index: 50;
+	border-top: 1px solid #2CB3E3;
 }
 
 
 .menu_up {
-	bottom: 0 !important;
+	left: 0 !important;
+	opacity: 0.9 !important;
 } 
 
 
@@ -397,16 +406,19 @@ footer {
 }
 
 #sked_refresh_con,
-#show_pins_con {
+#show_pins_con,
+#goto_bottom_con {
 	text-align: center;
 	border-top: 1px solid #2CB3E3;
 	width:100%;
 	display: block;
 }
 #sked_refresh,
-#show_pins {	
+#show_pins,
+#goto_bottom {	
 	width:100%;
 	padding: 20px 0;
+	color: #E0E0E0;	
 }
 
 #pin_program_list {
@@ -414,12 +426,18 @@ footer {
 	margin-bottom: 10px;
 }
 
+#pin_program_list li {
+	padding-top: 8px;
+}
+
+#pin_program_list li:first-child {
+	padding-top:0;
+}
+
 #pin_program_list time,
 #pin_program_list .title {
-	font-size: 15px;
 	color: #999;
 	letter-spacing: -1px;
-	
 }
 
 #pin_program_list time {
@@ -461,6 +479,9 @@ footer {
 #app_logo {
 	background-color: #fff;
 	margin: 14px 0;
-	-webkit-border-radius: 8px;	
-	border-radius: 8px;	
+}
+
+#menu_channel_list_link {
+	padding-bottom: 8px;
+	height: 58px !important;
 }

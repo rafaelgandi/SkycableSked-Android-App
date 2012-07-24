@@ -1,6 +1,6 @@
 /* 
 	Skycable Base Object
-	LM: 07-17-12
+	LM: 07-24-12
 */
 (function (window, document, z) {
 	var $PAGES = z('section.page'), // used in Ui
@@ -35,13 +35,11 @@
 		'KIX':66,
 		'LIFESTYLE NETWORK':34,
 		'MAX':49,
-		'MTV ASIA':00,
 		'MYX':39,
 		'SOLAR SPORTS':40,
 		'STAR MOVIES':26,
 		'STAR SPORTS':44,
 		'STAR WORLD':33,
-		'TLC':74,
 		'VELVET':35
 	};
 	
@@ -120,7 +118,19 @@
 	};
 	
 	
-	var Util = {		
+	var Util = {
+
+		script: function (_path, _run) {
+			z.get(_path, function (res) {
+				try {
+					// Global Eval 
+					// See: http://james.padolsey.com/jquery/#v=1.7.2&fn=jQuery.globalEval
+					window["eval"].call(window, res);
+					_run();
+				} catch (e) {alert('Unable to run '+_path+' js script');}
+			});
+		},
+		
 		setStoredSkedValue: function (_res) {
 			var r, err = false;					
 			try { r = JSON.parse(_res); }
@@ -570,7 +580,7 @@
 				}
 			});		
 			$root.on('sched_list_page', function (e, _data) {
-				Util.getElementFromCache('#sched_list_page h1').html(_data.channelName+'<br> <small>('+_data.date+')</small>');
+				Util.getElementFromCache('#sched_list_page h1').html(_data.channelName+'<br> <small>('+_data.date.replace(/\//g, '-')+')</small>');
 				Skycable.populateSchedListForChannel(_data.channelName, _data.date);						
 			});
 			
@@ -594,7 +604,7 @@
 				Skycable.exitApp();
 			});
 			
-			z('#menu_cannellist_link').on(TAP, function (e) {
+			z('#menu_channel_list_link').on(TAP, function (e) {
 				// Delay for the scrollTo function to work //
 				setTimeout(function () {
 					window.scrollTo(0,0);
@@ -612,16 +622,19 @@
 				}
 			};
 			document.addEventListener('backbutton', goBackHandler, false);			
-			// See: http://eightmedia.github.com/hammer.js/
-			new Hammer(document.body, { // Swipe right
-				drag_vertical: false,
-				drag_min_distance: 110
-			})
-			.ondragstart = function (e) {				
-				if (e.direction === 'right' && Math.ceil(Math.abs(e.angle)) < 38) {
-					goBackHandler(e);
-				}
-			};
+			Util.script('assets/js/hammer.min.js', function () { // load the Hammer library
+				// See: http://eightmedia.github.com/hammer.js/
+				new Hammer(document.body, { // Swipe right
+					drag_vertical: false,
+					drag_min_distance: 110
+				})
+				.ondragstart = function (e) {				
+					if (e.direction === 'right' && Math.ceil(Math.abs(e.angle)) < 38) {
+						goBackHandler(e);
+					}
+				};	
+			});
+			
 			
 			// Menu button //
 			document.addEventListener('menubutton', function () {
@@ -669,6 +682,12 @@
 					title: 'Refresh Schedules',
 					buttons: 'Yep,Nope'
 				});										
+			});
+			
+			// Scroll to bottom menu button //
+			z('#goto_bottom').on(TAP, function (e) {
+				e.preventDefault();
+				Util.scrollTo(Util.getElementFromCache('footer')[0]);
 			});
 			
 			$root.on('focus', 'a, button', function () {
