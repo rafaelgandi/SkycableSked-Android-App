@@ -1,12 +1,12 @@
 /* 
 	Skycable Base Object
-	LM: 07-24-12
+	LM: 12-17-12
 */
 (function (window, document, z) {
 	var $PAGES = z('section.page'), // used in Ui
 		$root = z(document),
-		TAP = 'tap',
-		DBLTAP = 'doubleTap ',
+		TAP = 'click',
+		DBLTAP = 'click ',
 		SKYCABLE_SCHEDULES = {},
 		PINNED_SCHEDULES = {},
 		doneBuildingChannelList = false,
@@ -119,9 +119,24 @@
 	
 	
 	var Util = {
+		
+		xhr: function (_path, _callback) {
+			_callback = _callback || function (res) {};
+			// See: http://osdir.com/ml/phonegap/2012-10/msg00885.html
+			var req = new XMLHttpRequest();
+			req.open("GET", _path, true);
+			req.onreadystatechange = function () {
+			  if (req.readyState == 4) {
+				if (req.status == 200 || req.status == 0) {
+				  _callback(req.responseText);
+				}
+			  }
+			};
+			req.send(null);
+		},
 
 		script: function (_path, _run) {
-			z.get(_path, function (res) {
+			Util.xhr(_path, function (res) {
 				try {
 					// Global Eval 
 					// See: http://james.padolsey.com/jquery/#v=1.7.2&fn=jQuery.globalEval
@@ -495,7 +510,7 @@
 					Ui.gotoPage('#pin_list_page');
 				});				
 				// Adding pins on programs //
-				$root.on(DBLTAP, '#sched_list li', function (e) {
+				$root.on('longTap', '#sched_list li', function (e) {
 					var that = this,
 						$me = z(that);
 					$me.addClass('hlight');
