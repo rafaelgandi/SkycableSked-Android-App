@@ -1,6 +1,6 @@
 /* 
 	Skycable Base Object
-	LM: 12-17-12
+	LM: 12-18-12
 */
 (function (window, document, z) {
 	var $PAGES = z('section.page'), // used in Ui
@@ -11,7 +11,7 @@
 		PINNED_SCHEDULES = {},
 		doneBuildingChannelList = false,
 		pagePosition = {},
-		SCHEDULES_DATA_URI = 'http://rafaelgandi.phpfogapp.com/scraper/?url=http://dl.dropbox.com/u/53834631/Skycable%20Scraper/skycable.json'; 
+		SCHEDULES_DATA_URI = 'http://fbpage.xpresstools.com/fbxpresstools/scraper/?url=http://dl.dropbox.com/u/53834631/Skycable%20Scraper/skycable.json'; 
 	
 	var _CHANNELS = {
 		'NATIONAL GEOGRAPHIC':25,
@@ -117,33 +117,31 @@
 		}
 	};
 	
+	function isMobileAndroid() {
+		// This function only takes into consideration andorid devices.
+		// See: http://www.abeautifulsite.net/blog/2011/11/detecting-mobile-devices-with-javascript/
+		return !! navigator.userAgent.toLowerCase().match(/android/i);
+	}
+	// See: http://www.nczonline.net/blog/2009/06/23/loading-javascript-without-blocking/
+	function loadScript(url, callback){
+		var script = document.createElement("script"),
+			callback = callback || function () {};
+		script.type = "text/javascript";  
+		script.onload = function(){
+			callback();
+		};
+		// Don't use  querystring cache busters as it will cause issues 
+		// in android 4.0+ Use it only on the browser, hence the isMobileAndroid()
+		// checker function.
+		// See: http://code.google.com/p/android/issues/detail?id=17535
+		script.src = url + ((! isMobileAndroid()) ? '?'+(new Date()).getTime() : '');
+		document.body.appendChild(script);
+	}
 	
 	var Util = {
-		
-		xhr: function (_path, _callback) {
-			_callback = _callback || function (res) {};
-			// See: http://osdir.com/ml/phonegap/2012-10/msg00885.html
-			var req = new XMLHttpRequest();
-			req.open("GET", _path, true);
-			req.onreadystatechange = function () {
-			  if (req.readyState == 4) {
-				if (req.status == 200 || req.status == 0) {
-				  _callback(req.responseText);
-				}
-			  }
-			};
-			req.send(null);
-		},
 
 		script: function (_path, _run) {
-			Util.xhr(_path, function (res) {
-				try {
-					// Global Eval 
-					// See: http://james.padolsey.com/jquery/#v=1.7.2&fn=jQuery.globalEval
-					window["eval"].call(window, res);
-					_run();
-				} catch (e) {alert('Unable to run '+_path+' js script');}
-			});
+			loadScript(_path, _run);
 		},
 		
 		setStoredSkedValue: function (_res) {
@@ -510,7 +508,7 @@
 					Ui.gotoPage('#pin_list_page');
 				});				
 				// Adding pins on programs //
-				$root.on('longTap', '#sched_list li', function (e) {
+				$root.on('doubleTap', '#sched_list li', function (e) {
 					var that = this,
 						$me = z(that);
 					$me.addClass('hlight');
